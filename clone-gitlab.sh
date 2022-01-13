@@ -9,7 +9,7 @@ counter=0
 
 clone() {
     project_ids=$(curl -s --header "PRIVATE-TOKEN: $3" https://$1/api/v4/groups/$2 | jq ".projects[].id")
-    counter=$((${counter} + ${#project_ids[@]}))
+    # counter=$((${counter} + ${#project_ids[@]}))
     
     for project_id in $(curl -s --header "PRIVATE-TOKEN: $3" https://$1/api/v4/groups/$2 | jq ".projects[].id"); 
     do
@@ -23,6 +23,7 @@ clone() {
         printf "Cloning $counter projects"
         printf "\r"
         git clone --quiet $project_url $project_path 2>&1 | grep -v 'warning'
+        ((counter=counter+1))
     done
     groups=$(curl -s --header "PRIVATE-TOKEN: $3" https://$1/api/v4/groups/$2/subgroups | jq ".[].id")
     if [ "$groups" != "" ]; then
