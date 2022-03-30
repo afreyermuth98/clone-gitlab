@@ -1,10 +1,14 @@
 # clone-gitlab
 
 `clone-gitlab.sh` is a pure bash script that will clone recursively all repositories from a Gitlab group
+
+## Prerequisites
+You need to have an API token
+
 ## Usage
 
 ```text
-wait-for-it.sh host groupd_id token
+clone-gitlab.sh host groupd_id token
 ```
 
 ## Examples
@@ -26,6 +30,6 @@ For example, let's imagine you have a parent group (ID = 222) with this structur
 ```
 
 ```text
-$ ./wait-for-it.sh gitlab.com 222 <YOUR_TOKEN>
+$ ./clone-gitlab.sh gitlab.com 222 <YOUR_TOKEN>
 
 ```
