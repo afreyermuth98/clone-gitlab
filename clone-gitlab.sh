@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
 usage() {
-    echo "Use: clone-gitlab <HOST> <GROUP_ID> <PRIVATE_TOKEN>"
+    echo "Use: clone-gitlab <HOST> <GROUP_ID> <PRIVATE_TOKEN> <TOKEN_NAME>"
     exit 1
 }
 
@@ -16,12 +16,13 @@ clone() {
         project=$(curl -s --header "PRIVATE-TOKEN: $3" https://$1/api/v4/projects/$project_id)
         project_name=`echo $project | jq ".name" | tr -d '"'`
         project_path=$(echo $project | jq ".name_with_namespace" | tr -d '"' | sed "s/ //g")
-        if [ "$4" != "" ];then
+        if [ "$5" != "" ];then
             project_path=$(echo $project_path | sed "s/$4\///g")
         fi
-        project_url=`echo $project | jq ".http_url_to_repo" | tr -d '"'`
+        project_url=`echo $project | jq ".http_url_to_repo" | tr -d '"' | sed s/$1/$4:$3@$1/`
         printf "Cloning $counter projects"
         printf "\r"
+
         git clone --quiet $project_url $project_path 2>&1 | grep -v 'warning'
         ((counter=counter+1))
     done
@@ -36,7 +37,7 @@ clone() {
 
 }
 
-if [[ $# -eq 3 ]]
+if [[ $# -eq 4 ]]
 then
     group_name=$(curl -s --header "PRIVATE-TOKEN: $3" https://$1/api/v4/groups/$2 | jq ".name" | tr -d '"')
     path_to_kill="$(curl -s --header "PRIVATE-TOKEN: $3" https://$1/api/v4/groups/$2 | jq ".full_name" | tr -d '"' | tr -d ' ' | sed s/.$group_name//)"
